@@ -13,7 +13,6 @@
         }
 
         .top {
-            background: black;
             border-bottom: 3px solid gold;
             padding: 15px;
             color: gold;
@@ -59,27 +58,26 @@
 <input id="image" placeholder="Image URL"><br>
 <input id="link" placeholder="Book Link"><br>
 
-<button id="addBtn">Add Book</button>
+<button onclick="addBook()">Add Book</button>
 
 <div id="books"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script>
-const supabaseUrl = "https://ylvvrslouwwjxxxqznvu.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsdnZyc2xvdXd3anh4eHF6bnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5ODUyNjgsImV4cCI6MjA5MTU2MTI2OH0.1ywVFQ0lYYOI8DLAMmKGMUVXiK1FQPWYMQfuRBnJK1o";
+const firebaseConfig = {
+  apiKey: "AIzaSyCzrfF88beuRBN5alpzw2Wly1MD7fizm0U",
+  authDomain: "trovynx-studios.firebaseapp.com",
+  projectId: "trovynx-studios",
+  storageBucket: "trovynx-studios.firebasestorage.app",
+  messagingSenderId: "224831240998",
+  appId: "1:224831240998:web:64f0d13efbee3fe4c21fe7"
+};
 
-let supabase;
-
-// WAIT UNTIL EVERYTHING LOADS
-window.addEventListener("load", () => {
-
-    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-    document.getElementById("addBtn").addEventListener("click", addBook);
-
-    loadBooks();
-});
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // ADD BOOK
 async function addBook() {
@@ -88,14 +86,16 @@ async function addBook() {
     let image = document.getElementById("image").value;
     let link = document.getElementById("link").value;
 
-    let { error } = await supabase.from("books").insert([
-        { name, image, link, likes: 0, views: 0 }
-    ]);
-
-    if (error) {
-        alert("ERROR: " + error.message);
+    if (!name || !image || !link) {
+        alert("Fill all fields!");
         return;
     }
+
+    await db.collection("books").add({
+        name,
+        image,
+        link
+    });
 
     alert("Saved ✔");
 
@@ -105,16 +105,13 @@ async function addBook() {
 // LOAD BOOKS
 async function loadBooks() {
 
-    let { data, error } = await supabase.from("books").select("*");
-
-    if (error) {
-        alert("LOAD ERROR: " + error.message);
-        return;
-    }
+    let snapshot = await db.collection("books").get();
 
     document.getElementById("books").innerHTML = "";
 
-    data.forEach((b) => {
+    snapshot.forEach(doc => {
+        let b = doc.data();
+
         document.getElementById("books").innerHTML += `
         <div class="book">
             <img src="${b.image}">
@@ -126,6 +123,9 @@ async function loadBooks() {
         `;
     });
 }
+
+// LOAD ON START
+loadBooks();
 </script>
 
 </body>
