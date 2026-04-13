@@ -59,19 +59,27 @@
 <input id="image" placeholder="Image URL"><br>
 <input id="link" placeholder="Book Link"><br>
 
-<button onclick="addBook()">Add Book</button>
+<button id="addBtn">Add Book</button>
 
 <div id="books"></div>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// 🔴 PASTE FRESH VALUES HERE
 const supabaseUrl = "https://ylvvrslouwwjxxxqznvu.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsdnZyc2xvdXd3anh4eHF6bnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5ODUyNjgsImV4cCI6MjA5MTU2MTI2OH0.1ywVFQ0lYYOI8DLAMmKGMUVXiK1FQPWYMQfuRBnJK1o";
 
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+let supabase;
+
+// WAIT UNTIL EVERYTHING LOADS
+window.addEventListener("load", () => {
+
+    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    document.getElementById("addBtn").addEventListener("click", addBook);
+
+    loadBooks();
+});
 
 // ADD BOOK
 async function addBook() {
@@ -118,9 +126,6 @@ async function loadBooks() {
         `;
     });
 }
-
-// LOAD ON START
-loadBooks();
 </script>
 
 </body>
