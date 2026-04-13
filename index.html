@@ -1,80 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Trovynx Studios</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-            background: black;
-            color: white;
-            text-align: center;
-        }
-
-        .top {
-            background: black;
-            border-bottom: 3px solid gold;
-            padding: 15px;
-            color: gold;
-            font-size: 24px;
-        }
-
-        .book {
-            background: #1e1e1e;
-            margin: 20px auto;
-            padding: 15px;
-            width: 300px;
-            border-radius: 15px;
-        }
-
-        input {
-            margin: 5px;
-            padding: 8px;
-            width: 250px;
-        }
-
-        button {
-            padding: 10px;
-            background: gold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        img {
-            width: 100%;
-            border-radius: 10px;
-        }
-    </style>
-</head>
-
 <body>
 
-<div class="top">TROVYNX STUDIOS</div>
+<h2>JS TEST</h2>
 
-<h2>Admin Add Book</h2>
-
-<input id="name" placeholder="Book Name"><br>
-<input id="image" placeholder="Image URL"><br>
-<input id="link" placeholder="BriBooks Link"><br>
-
-<button onclick="addBook()">Add Book</button>
-
-<div id="books"></div>
-
-<!-- SCRIPT -->
-<script>
-console.log("SCRIPT LOADED");
-
-// STEP 1: TEST BUTTON FIRST
-window.addBook = function () {
-    alert("BUTTON WORKS ✔");
-
-    // AFTER CONFIRMING, we will connect Supabase
-    console.log("Name:", document.getElementById("name").value);
-};
-</script>
+<button onclick="alert('BUTTON WORKS')">
+Click Me
+</button>
 
 </body>
 </html>
