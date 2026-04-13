@@ -57,17 +57,19 @@
 
 <input id="name" placeholder="Book Name"><br>
 <input id="image" placeholder="Image URL"><br>
-<input id="link" placeholder="BriBooks Link"><br>
+<input id="link" placeholder="Book Link"><br>
 
 <button onclick="addBook()">Add Book</button>
 
 <div id="books"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabaseUrl = "https://wkqvnqtfdlufngdwimvo.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcXZucXRmZGx1Zm5nZHdpbXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5ODAwNjIsImV4cCI6MjA5MTU1NjA2Mn0.DPFOkWSwqGEvamd1rMtSbiH6ZfqDQCQBwtzKq3D8uo0";
+// 🔴 PASTE FRESH VALUES HERE
+const supabaseUrl = "https://ylvvrslouwwjxxxqznvu.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsdnZyc2xvdXd3anh4eHF6bnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5ODUyNjgsImV4cCI6MjA5MTU2MTI2OH0.1ywVFQ0lYYOI8DLAMmKGMUVXiK1FQPWYMQfuRBnJK1o";
 
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -79,19 +81,15 @@ async function addBook() {
     let link = document.getElementById("link").value;
 
     let { error } = await supabase.from("books").insert([
-        {
-            name: name,
-            image: image,
-            link: link,
-            likes: 0,
-            views: 0
-        }
+        { name, image, link, likes: 0, views: 0 }
     ]);
 
     if (error) {
         alert("ERROR: " + error.message);
         return;
     }
+
+    alert("Saved ✔");
 
     loadBooks();
 }
@@ -121,67 +119,9 @@ async function loadBooks() {
     });
 }
 
+// LOAD ON START
 loadBooks();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const supabaseUrl = "https://wkqvnqtfdlufngdwimvo.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcXZucXRmZGx1Zm5nZHdpbXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5ODAwNjIsImV4cCI6MjA5MTU1NjA2Mn0.DPFOkWSwqGEvamd1rMtSbiH6ZfqDQCQBwtzKq3D8uo0";
-
-let supabaseClient = null;
-
-window.addEventListener("load", () => {
-    supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-    loadBooks();
-});
-
-window.addBook = async function () {
-
-    alert("Clicked ✔");
-
-    let name = document.getElementById("name").value;
-    let image = document.getElementById("image").value;
-    let link = document.getElementById("link").value;
-
-    let { error } = await supabaseClient.from("books").insert([
-        { name, image, link, likes: 0, views: 0 }
-    ]);
-
-    if (error) {
-        alert("ERROR: " + error.message);
-        return;
-    }
-
-    loadBooks();
-};
-
-async function loadBooks() {
-
-    if (!supabaseClient) return;
-
-    let { data, error } = await supabaseClient.from("books").select("*");
-
-    if (error) {
-        alert("LOAD ERROR: " + error.message);
-        return;
-    }
-
-    document.getElementById("books").innerHTML = "";
-
-    data.forEach(b => {
-        document.getElementById("books").innerHTML += `
-        <div class="book">
-            <img src="${b.image}">
-            <h3>${b.name}</h3>
-            <a href="${b.link}" target="_blank">
-                <button>Read</button>
-            </a>
-        </div>
-        `;
-    });
-}
-</script>
 </body>
 </html>
