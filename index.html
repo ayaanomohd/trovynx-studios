@@ -18,7 +18,6 @@
             padding: 15px;
             color: gold;
             font-size: 24px;
-            font-weight: bold;
         }
 
         .book {
@@ -31,19 +30,16 @@
 
         input {
             margin: 5px;
-            padding: 10px;
-            width: 260px;
-            border-radius: 8px;
-            border: none;
+            padding: 8px;
+            width: 250px;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px;
             background: gold;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-weight: bold;
         }
 
         img {
@@ -57,7 +53,7 @@
 
 <div class="top">TROVYNX STUDIOS</div>
 
-<h2>Add Book</h2>
+<h2>Admin Add Book</h2>
 
 <input id="name" placeholder="Book Name"><br>
 <input id="image" placeholder="Image URL"><br>
@@ -67,42 +63,26 @@
 
 <div id="books"></div>
 
-<script>
-window.addBook = function () {
-    alert("Button works again ✔");
-
-    let name = document.getElementById("name").value;
-    let image = document.getElementById("image").value;
-    let link = document.getElementById("link").value;
-
-    let div = document.createElement("div");
-    div.className = "book";
-
-    div.innerHTML = `
-        <img src="${image}">
-        <h3>${name}</h3>
-        <a href="${link}" target="_blank">
-            <button>Read</button>
-        </a>
-    `;
-
-    document.getElementById("books").appendChild(div);
-};
-</script>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabaseUrl = "https://ylvvrslouwwjxxxqznvu.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsdnZyc2xvdXd3anh4eHF6bnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5ODUyNjgsImV4cCI6MjA5MTU2MTI2OH0.1ywVFQ0lYYOI8DLAMmKGMUVXiK1FQPWYMQfuRBnJK1o";
+const supabaseUrl = "https://wkqvnqtfdlufngdwimvo.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcXZucXRmZGx1Zm5nZHdpbXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5ODAwNjIsImV4cCI6MjA5MTU1NjA2Mn0.DPFOkWSwqGEvamd1rMtSbiH6ZfqDQCQBwtzKq3D8uo0";
 
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+// ADD BOOK
 window.addBook = async function () {
 
     let name = document.getElementById("name").value;
     let image = document.getElementById("image").value;
     let link = document.getElementById("link").value;
+
+    if (!name || !image || !link) {
+        alert("Please fill all fields!");
+        return;
+    }
 
     let { error } = await supabase.from("books").insert([
         { name, image, link, likes: 0, views: 0 }
@@ -110,10 +90,40 @@ window.addBook = async function () {
 
     if (error) {
         alert("Error: " + error.message);
-    } else {
-        alert("Saved to cloud ✔");
+        return;
     }
+
+    loadBooks(); // refresh after adding
 };
+
+// LOAD BOOKS FROM DATABASE
+async function loadBooks() {
+
+    let { data, error } = await supabase.from("books").select("*");
+
+    if (error) {
+        alert("Load error: " + error.message);
+        return;
+    }
+
+    document.getElementById("books").innerHTML = "";
+
+    data.forEach((b) => {
+        document.getElementById("books").innerHTML += `
+        <div class="book">
+            <img src="${b.image}">
+            <h3>${b.name}</h3>
+            <a href="${b.link}" target="_blank">
+                <button>Read</button>
+            </a>
+        </div>
+        `;
+    });
+}
+
+// AUTO LOAD ON START
+loadBooks();
 </script>
+
 </body>
-</html>
+</html> 
