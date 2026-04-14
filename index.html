@@ -6,7 +6,7 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: black;
             color: white;
             text-align: center;
@@ -17,33 +17,55 @@
             padding: 15px;
             color: gold;
             font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        #books {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 30px;
         }
 
         .book {
             background: #1e1e1e;
-            margin: 20px auto;
             padding: 15px;
-            width: 300px;
+            width: 260px;
             border-radius: 15px;
+            border: 1px solid #333;
+            transition: transform 0.3s;
         }
 
-        input {
-            margin: 5px;
-            padding: 8px;
-            width: 250px;
+        .book:hover {
+            transform: translateY(-10px);
+            border-color: gold;
         }
 
         button {
-            padding: 10px;
+            padding: 12px;
             background: gold;
             border: none;
             border-radius: 10px;
             cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 16px;
         }
 
         img {
             width: 100%;
+            height: 380px;
+            object-fit: cover;
             border-radius: 10px;
+            background: #333; /* Placeholder color while loading */
+        }
+
+        h3 {
+            margin: 15px 0 5px 0;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -52,79 +74,56 @@
 
 <div class="top">TROVYNX STUDIOS</div>
 
-<h2>Add Book</h2>
+<h2 style="margin-top: 30px;">My Library</h2>
 
-<input id="name" placeholder="Book Name"><br>
-<input id="image" placeholder="Image URL"><br>
-<input id="link" placeholder="Book Link"><br>
-
-<button onclick="addBook()">Add Book</button>
-
-<div id="books"></div>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<div id="books">Loading books from the database...</div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCzrfF88beuRBN5alpzw2Wly1MD7fizm0U",
-  authDomain: "trovynx-studios.firebaseapp.com",
-  projectId: "trovynx-studios",
-  storageBucket: "trovynx-studios.firebasestorage.app",
-  messagingSenderId: "224831240998",
-  appId: "1:224831240998:web:64f0d13efbee3fe4c21fe7"
-};
+// This is your specific Sheet link formatted for CSV export
+const sheetUrl = "https://docs.google.com/spreadsheets/d/1F3MnUAX8ZZl0T2X-QuasuWg0jl8LrH6ts5eIWUE4ho8/export?format=csv";
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ADD BOOK
-async function addBook() {
-
-    let name = document.getElementById("name").value;
-    let image = document.getElementById("image").value;
-    let link = document.getElementById("link").value;
-
-    if (!name || !image || !link) {
-        alert("Fill all fields!");
-        return;
-    }
-
-    await db.collection("books").add({
-        name,
-        image,
-        link
-    });
-
-    alert("Saved ✔");
-
-    loadBooks();
-}
-
-// LOAD BOOKS
 async function loadBooks() {
+    try {
+        const response = await fetch(sheetUrl);
+        const data = await response.text();
+        
+        // Split data into rows
+        const rows = data.split('\n');
+        
+        let html = '';
 
-    let snapshot = await db.collection("books").get();
+        // We start at i = 1 to skip the header row (Name, Image, Link)
+        for (let i = 1; i < rows.length; i++) {
+            // Split row by commas
+            const columns = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            if (columns.length >= 3) {
+                const name = columns[0].replace(/"/g, "").trim(); 
+                const image = columns[1].replace(/"/g, "").trim();
+                const link = columns[2].replace(/"/g, "").trim();
 
-    document.getElementById("books").innerHTML = "";
+                if(name !== "") {
+                    html += `
+                    <div class="book">
+                        <img src="${image}" alt="${name}" onerror="this.src='https://via.placeholder.com/260x380?text=No+Cover+Found'">
+                        <h3>${name}</h3>
+                        <a href="${link}" target="_blank">
+                            <button>Read on BriBooks</button>
+                        </a>
+                    </div>
+                    `;
+                }
+            }
+        }
+        
+        document.getElementById('books').innerHTML = html || "No books found in the sheet!";
 
-    snapshot.forEach(doc => {
-        let b = doc.data();
-
-        document.getElementById("books").innerHTML += `
-        <div class="book">
-            <img src="${b.image}">
-            <h3>${b.name}</h3>
-            <a href="${b.link}" target="_blank">
-                <button>Read</button>
-            </a>
-        </div>
-        `;
-    });
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById('books').innerHTML = "Error loading library. Make sure your Sheet is shared to 'Anyone with the link'!";
+    }
 }
 
-// LOAD ON START
 loadBooks();
 </script>
 
