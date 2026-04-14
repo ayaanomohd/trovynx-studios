@@ -1,24 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trovynx Studios</title>
+
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1iDTzGAI9i45S97mD3JMO4sqwqRb5NTLE">
+    
+    <meta property="og:image" content="https://lh3.googleusercontent.com/d/1iDTzGAI9i45S97mD3JMO4sqwqRb5NTLE">
 
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background: black;
             color: white;
             text-align: center;
         }
 
         .top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
             border-bottom: 3px solid gold;
             padding: 15px;
             color: gold;
             font-size: 24px;
             font-weight: bold;
             letter-spacing: 2px;
+        }
+
+        .header-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            object-fit: cover;
         }
 
         #books {
@@ -35,12 +52,13 @@
             width: 260px;
             border-radius: 15px;
             border: 1px solid #333;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
         }
 
         .book:hover {
             transform: translateY(-10px);
             border-color: gold;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
         }
 
         button {
@@ -53,14 +71,15 @@
             width: 100%;
             margin-top: 15px;
             font-size: 16px;
+            color: black;
         }
 
-        img {
+        img.book-cover {
             width: 100%;
             height: 380px;
             object-fit: cover;
             border-radius: 10px;
-            background: #333; /* Placeholder color while loading */
+            background: #2a2a2a;
         }
 
         h3 {
@@ -72,40 +91,47 @@
 
 <body>
 
-<div class="top">TROVYNX STUDIOS</div>
+<div class="top">
+    <img src="https://lh3.googleusercontent.com/d/1iDTzGAI9i45S97mD3JMO4sqwqRb5NTLE" class="header-logo" alt="Logo">
+    <span>TROVYNX STUDIOS</span>
+</div>
 
 <h2 style="margin-top: 30px;">My Library</h2>
 
-<div id="books">Loading books from the database...</div>
+<div id="books">Loading your books...</div>
 
 <script>
-// This is your specific Sheet link formatted for CSV export
+// THE DATABASE LINK
 const sheetUrl = "https://docs.google.com/spreadsheets/d/1F3MnUAX8ZZl0T2X-QuasuWg0jl8LrH6ts5eIWUE4ho8/export?format=csv";
 
 async function loadBooks() {
     try {
         const response = await fetch(sheetUrl);
         const data = await response.text();
-        
-        // Split data into rows
         const rows = data.split('\n');
         
         let html = '';
 
-        // We start at i = 1 to skip the header row (Name, Image, Link)
         for (let i = 1; i < rows.length; i++) {
-            // Split row by commas
             const columns = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             
             if (columns.length >= 3) {
                 const name = columns[0].replace(/"/g, "").trim(); 
-                const image = columns[1].replace(/"/g, "").trim();
+                let image = columns[1].replace(/"/g, "").trim();
                 const link = columns[2].replace(/"/g, "").trim();
+
+                // AUTOMATIC GOOGLE DRIVE IMAGE FIX
+                if (image.includes("drive.google.com")) {
+                    const fileId = image.match(/[-\w]{25,}/);
+                    if (fileId) {
+                        image = `https://lh3.googleusercontent.com/d/${fileId[0]}`;
+                    }
+                }
 
                 if(name !== "") {
                     html += `
                     <div class="book">
-                        <img src="${image}" alt="${name}" onerror="this.src='https://via.placeholder.com/260x380?text=No+Cover+Found'">
+                        <img src="${image}" class="book-cover" alt="${name}" onerror="this.src='https://via.placeholder.com/260x380?text=Check+Link+Sharing'">
                         <h3>${name}</h3>
                         <a href="${link}" target="_blank">
                             <button>Read on BriBooks</button>
@@ -116,11 +142,11 @@ async function loadBooks() {
             }
         }
         
-        document.getElementById('books').innerHTML = html || "No books found in the sheet!";
+        document.getElementById('books').innerHTML = html || "No books found!";
 
     } catch (error) {
         console.error("Error:", error);
-        document.getElementById('books').innerHTML = "Error loading library. Make sure your Sheet is shared to 'Anyone with the link'!";
+        document.getElementById('books').innerHTML = "Error loading database.";
     }
 }
 
