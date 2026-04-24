@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <meta name="google-site-verification" content="google7fb94b22412a3ed8.html" />
+    <meta name="google-site-verification" content="ee1ea866d84bd336" />
     
     <title>Trovynx Studios</title>
 
@@ -13,85 +13,17 @@
     <meta property="og:image" content="https://lh3.googleusercontent.com/d/1Xl8Zj1sK3C7d9Ss0boCB5aS4AIrBCfoE">
 
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: black;
-            color: white;
-            text-align: center;
-        }
-
-        .top {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            border-bottom: 3px solid gold;
-            padding: 15px;
-            color: gold;
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-
-        .header-logo {
-            width: 45px;
-            height: 45px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        #books {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
-            padding: 30px;
-        }
-
-        .book {
-            background: #1e1e1e;
-            padding: 15px;
-            width: 260px;
-            border-radius: 15px;
-            border: 1px solid #333;
-            transition: all 0.3s ease;
-        }
-
-        .book:hover {
-            transform: translateY(-10px);
-            border-color: gold;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
-        }
-
-        button {
-            padding: 12px;
-            background: gold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 15px;
-            font-size: 16px;
-            color: black;
-        }
-
-        img.book-cover {
-            width: 100%;
-            height: 380px;
-            object-fit: cover;
-            border-radius: 10px;
-            background: #2a2a2a;
-        }
-
-        h3 {
-            margin: 15px 0 5px 0;
-            font-size: 18px;
-        }
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: black; color: white; text-align: center; }
+        .top { display: flex; align-items: center; justify-content: center; gap: 15px; border-bottom: 3px solid gold; padding: 15px; color: gold; font-size: 24px; font-weight: bold; letter-spacing: 2px; }
+        .header-logo { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
+        #books { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; padding: 30px; }
+        .book { background: #1e1e1e; padding: 15px; width: 260px; border-radius: 15px; border: 1px solid #333; transition: all 0.3s ease; }
+        .book:hover { transform: translateY(-10px); border-color: gold; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2); }
+        button { padding: 12px; background: gold; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; font-size: 16px; color: black; }
+        img.book-cover { width: 100%; height: 380px; object-fit: cover; border-radius: 10px; background: #2a2a2a; }
+        h3 { margin: 15px 0 5px 0; font-size: 18px; }
     </style>
 </head>
-
 <body>
 
 <div class="top">
@@ -100,7 +32,6 @@
 </div>
 
 <h2 style="margin-top: 30px;">My Library</h2>
-
 <div id="books">Loading your books...</div>
 
 <script>
@@ -111,49 +42,33 @@ async function loadBooks() {
         const response = await fetch(sheetUrl);
         const data = await response.text();
         const rows = data.split('\n');
-        
         let html = '';
-
         for (let i = 1; i < rows.length; i++) {
             const columns = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            
             if (columns.length >= 3) {
                 const name = columns[0].replace(/"/g, "").trim(); 
                 let image = columns[1].replace(/"/g, "").trim();
                 const link = columns[2].replace(/"/g, "").trim();
-
-                // AUTOMATIC GOOGLE DRIVE IMAGE FIX
                 if (image.includes("drive.google.com")) {
                     const fileId = image.match(/[-\w]{25,}/);
-                    if (fileId) {
-                        image = `https://lh3.googleusercontent.com/d/${fileId[0]}`;
-                    }
+                    if (fileId) { image = `https://lh3.googleusercontent.com/d/${fileId[0]}`; }
                 }
-
                 if(name !== "") {
                     html += `
                     <div class="book">
                         <img src="${image}" class="book-cover" alt="${name}" onerror="this.src='https://via.placeholder.com/260x380?text=Check+Link+Sharing'">
                         <h3>${name}</h3>
-                        <a href="${link}" target="_blank">
-                            <button>Read on BriBooks</button>
-                        </a>
-                    </div>
-                    `;
+                        <a href="${link}" target="_blank"><button>Read on BriBooks</button></a>
+                    </div>`;
                 }
             }
         }
-        
         document.getElementById('books').innerHTML = html || "No books found!";
-
     } catch (error) {
-        console.error("Error:", error);
         document.getElementById('books').innerHTML = "Error loading database.";
     }
 }
-
 loadBooks();
 </script>
-
 </body>
 </html>
